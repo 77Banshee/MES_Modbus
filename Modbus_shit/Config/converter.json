@@ -1,0 +1,21 @@
+{
+  "converter": [
+    {
+        "name" : "ZET_7076_1",
+        "ip_address": "192.168.9.11",
+        "devices": [
+          {
+            "slave": 11,
+            "type" : "ZET_7054_Inclinometer",
+            "name" : "INC_1",
+            "id": "01",
+            "registers":
+              {
+                "x": [20, 21],
+                "y": [58, 59]
+              }
+          }
+        ]
+    }
+  ]
+}
