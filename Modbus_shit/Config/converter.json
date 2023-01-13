@@ -1,14 +1,47 @@
 {
-  "converter": [
+  "converters": [
     {
-        "name" : "ZET_7076_1",
-        "ip_address": "192.168.9.11",
+        "name" : "ZET_7076_3", 
+        "ip_address": "192.168.9.13",
         "devices": [
           {
-            "slave": 11,
+            "slave": 19,
             "type" : "ZET_7054_Inclinometer",
-            "name" : "INC_1",
-            "id": "01",
+            "name" : "INC-9",
+            "id": "80309",
+            "registers":
+              {
+                "x": [20, 21],
+                "y": [58, 59]
+              }
+          },
+          {
+            "slave": 20,
+            "type" : "ZET_7054_Inclinometer",
+            "name" : "INC-10",
+            "id": "80310",
+            "registers":
+              {
+                "x": [20, 21],
+                "y": [58, 59]
+              }
+          },
+          {
+            "slave": 21,
+            "type" : "ZET_7054_Inclinometer",
+            "name" : "INC-11",
+            "id": "80311",
+            "registers":
+              {
+                "x": [20, 21],
+                "y": [58, 59]
+              }
+          },
+          {
+            "slave": 22,
+            "type" : "ZET_7054_Inclinometer",
+            "name" : "INC_12",
+            "id": "80312",
             "registers":
               {
                 "x": [20, 21],
