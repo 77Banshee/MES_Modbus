@@ -2,6 +2,10 @@ from pyModbusTCP.client import ModbusClient
 import time
 
 
+#ACC
+#TG
+#
+
 def inclinometer_example():
     slaves = [19, 20, 21]
 
@@ -46,6 +50,12 @@ def thermometer_example():
         client.close()
         time.sleep(4)
         print()
+
+def hygrometer_example():
+    regs = [20,21,58,59,96,97]
+    
+def accelerometer_example():
+    regs = [20,21,44,45,46,47,58,59,82,83,84,85,96,97,120,121,122,123]
 
 if __name__ == "__main__":
     thermometer_example()
