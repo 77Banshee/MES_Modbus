@@ -52,10 +52,28 @@ def thermometer_example():
         print()
 
 def hygrometer_example():
+    slave = 41
     regs = [20,21,58,59,96,97]
+    client = ModbusClient("192.168.9.15", 502, slave, 30.0, False, True, False)
+    for i in regs:
+        print(client.read_holding_registers(i))
+    print()
+    client.close()
+    time.sleep(2)
+    print()
     
 def accelerometer_example():
     regs = [20,21,44,45,46,47,58,59,82,83,84,85,96,97,120,121,122,123]
+
+    slave = 4
+    client = ModbusClient("192.168.9.16", 502, slave, 30.0, False, True, False)
+    for i in regs:
+        print(client.read_holding_registers(i))
+    print()
+    client.close()
+    time.sleep(2)
+    print()
+
 
 if __name__ == "__main__":
     thermometer_example()

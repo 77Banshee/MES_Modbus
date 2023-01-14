@@ -1,6 +1,7 @@
 from pyModbusTCP.client import ModbusClient
 import struct
 import json
+import time
 
 #192.168.9.
     #..
@@ -14,7 +15,7 @@ import json
     #19
     #20
 
-class Converter_Repository():
+class Converter_Repository(object):
     def __init__(self, path_to_cfg: str):
         self.converter_list = []
         with open(path_to_cfg, 'r') as f:
@@ -52,11 +53,11 @@ class Zet7076_Converter(object):
                             type=i["type"],
                             name=i["name"],
                             slave=i['slave'],
-                            x_registers=i['registers']['x'], 
-                            y_registers=i['registers']['y']
+                            x_low_high_regs=i['registers']['x'], 
+                            y_low_high_regs=i['registers']['y']
                         )
                     )
-            elif i['type'] == 'Thermometer':
+            elif i['type'] == 'ZET_thermometer':
                     raise NotImplementedError('Zet_Converter.init_devices() THERMOMTER NOT IMPLEMENT')
 
     def receive_all(self):
@@ -67,7 +68,7 @@ class Zet7076_Converter(object):
         for i in self.devices:
             if i.type == "ZET_7054_Inclinometer":
                     print(f"[*] Process device: {i.name} slave: {i.slave_number}")
-                    client = ModbusClient(host=self.ip_address, port=self.port, unit_id=i.slave_number) #Slave?
+                    client = ModbusClient(host=self.ip_address, port=self.port, unit_id=i.slave_number, timeout=30.0, debug=False, auto_open=True, auto_close=False) #Slave?
                     x_high = client.read_holding_registers(i.x_registers[1])  # В struct pack/unpack передавать сначала 21 потом 20 регистр.
                     x_low = client.read_holding_registers(i.x_registers[0])  # В struct pack/unpack передавать сначала 21 потом 20 регистр.
                     y_high = client.read_holding_registers(i.y_registers[1])  # В struct pack/unpack передавать сначала 21 потом 20 регистр.
@@ -79,39 +80,61 @@ class Zet7076_Converter(object):
                     
                     x_decoded = i.decode(x_high[0], x_low[0])
                     y_decoded = i.decode(y_high[0], y_low[0])
-                    print(f"x_raw: {x_decoded}")
-                    print(f"y_raw: {y_decoded}")
+                    print(f"x_decoded: {x_decoded}")
+                    print(f"y_decoded: {y_decoded}")
+                    client.close()
+                    time.sleep(2)
                     
                     # print(f"{i.name} {i.type} | x: {i.decode(x_raw)} | y: {i.decode(y_raw)}")
             else:
                 raise ValueError("[*] Wrong device type!")
-# x_raw: [[16408], [43274]]
-# y_raw: [[49431], [11310]]       
 
-class Zet_Inclinometer(object):
-    def __init__(self, id: str, slave: int, name, type, x_registers, y_registers):
-        [self.id] = id,
-        self.x_registers = x_registers
-        self.y_registers = y_registers
+class Zet_device(object):
+    def __init__(self, id: str, slave: int, name) -> None:
+        self.id = id
         self.slave_number = slave
         self.name = name
+
+class Zet_Inclinometer(Zet_device):
+    def __init__(self, id: str, slave: int, name:str, type:str, x_low_high_regs, y_low_high_regs) -> None:
+        super().__init__(id, slave, name)
+        self.x_registers = x_low_high_regs # 20 - low | 21 - high
+        self.y_registers = x_low_high_regs # 58 - low | 59 - high
         self.type = type
 
     def __str__(self):
         return f"Zet_Inclinomter: ID: {self.id}, x_registers: {self.x_registers}, y_registers: {self.y_registers}, slave_number: {self.slave_number}"
 
-    def decode(self, high, low):
-        to_bytes = struct.pack('>HH', high, low)
+    def decode(self, high_bytes, low_bytes):
+        to_bytes = struct.pack('>HH', high_bytes, low_bytes)
         float_res = struct.unpack('>f', to_bytes)
         return float_res[0]
+class Zet_Thermometer(Zet_device):
+    def __init__(self, id: str, slave: int, name:str, type:str, registers:list) -> None:
+        super().__init__(id, slave, name)
+        self.registers = registers
+        self.type = type
 
-    # Do i even need it?
-    # def receive(self, ip, port, unit_id):
-    #     client = ModbusClient(ip, port, unit_id)  # 0x03 register.
-    #     x_raw_values = client.read_holding_registers(self.x_registers[0], 2)  # В struct pack/unpack передавать сначала 21 потом 20 регистр.
-    #     y_raw_values = client.read_holding_registers(self.y_registers[0], 2)
-    #     return self.to_float(x_raw_values), self.to_float(y_raw_values) # X, Y
+    def decode():
+        pass
+    
+class Zet_Accelerometer(Zet_device):
+    def __init__(self, id: str, slave: int, name:str, type:str, registers:list) -> None:
+        super().__init__(id, slave, name)
+        self.registers = registers
+        self.type = type
 
+    def decode():
+        pass
+
+class Zet_Hygrometer(Zet_device):
+    def __init__(self, id: str, slave: int, name:str, type:str, registers:list) -> None:
+        super().__init__(id, slave, name)
+        self.registers = registers
+        self.type = type
+
+    def decode():
+        pass
 
 if __name__ == '__main__':
     print("__Modbus_client__")
