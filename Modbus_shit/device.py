@@ -20,11 +20,12 @@ class Collected_Measures(object):
             Hygrometer: ?
     """
     def __init__(self, device_instance, measures) -> None:
-        measures = []
-        dev_type = device_instance.type
-        dev_name = device_instance.name
+        self.measures = measures
+        self.device_instance = device_instance
     def get_formatted_measures(self):
         print("get_formatted_measures Not implemented!")
+    def __str__(self) -> str:
+        return f"{self.device_instance.type} {self.device_instance.name} {self.device_instance.id} {self.measures}"
 
 class Converter_Repository(object):
     def __init__(self, json_config: str):
@@ -35,6 +36,7 @@ class Converter_Repository(object):
     def init_converter_list(self):
         converter_list_raw = self.json_config["converters"]
         for i in range(0, len(converter_list_raw)):
+            print(f"[*] Init converter {converter_list_raw[i]['name']}")
             self.converter_list.append(
                 Zet7076_Converter(
                     ip_address=converter_list_raw[i]['ip_address'],
@@ -54,12 +56,14 @@ class Zet7076_Converter(object):
         self.port = port
         self.devices = []
         self.init_devices(sensor_list_raw)
+        print()
 
     def __str__(self):
         return f"Zet_Converter: Name: {self.name}, ip_address: {self.ip_address}"
 
     def init_devices(self, sensor_list_raw):
         for i in sensor_list_raw:
+            print(i['name'])
             if i['type'] == 'ZET_7054_Inclinometer':
                     self.devices.append(
                         Zet_Inclinometer(
@@ -71,8 +75,37 @@ class Zet7076_Converter(object):
                             y_low_high_regs=i['registers']['y']
                         )
                     )
-            elif i['type'] == 'ZET_thermometer':
-                    raise NotImplementedError('Zet_Converter.init_devices() THERMOMTER NOT IMPLEMENT')
+            elif i['type'] == 'ZET_Thermometer':
+                    self.devices.append(
+                        Zet_Thermometer(
+                            id=i["id"],
+                            slave=i["slave"],
+                            name=i["name"],
+                            type=i["type"],
+                            registers=i["registers"],
+                            last_sensor = i["last_sensor"]
+                        )
+                    )
+            elif i['type'] == 'ZET_Accelerometer':
+                    self.devices.append(
+                        Zet_Accelerometer(
+                            id=i["id"],
+                            slave=i["slave"],
+                            name=i["name"],
+                            type=i["type"],
+                            registers=i["registers"]
+                        )
+                    )
+            elif i['type'] == 'ZET_Hygrometer':
+                    self.devices.append(
+                        Zet_Hygrometer(
+                            id=i["id"],
+                            slave=i["slave"],
+                            name=i["name"],
+                            type=i["type"],
+                            registers=i["registers"]
+                        )
+                    )
 
     def request_data(self):
         if not self.devices:
@@ -81,29 +114,72 @@ class Zet7076_Converter(object):
         print(f"\t[*] Process converter: {self.name}")
         for i in self.devices:
             if i.type == "ZET_7054_Inclinometer":
-                    print(f"\t\t[*] Process device: {i.name} slave: {i.slave_number}")
-                    client = ModbusClient(host=self.ip_address, port=self.port, unit_id=i.slave_number, timeout=30.0, debug=False, auto_open=True, auto_close=False) #Slave?
-                    x_high = client.read_holding_registers(i.x_registers[1])  # В struct pack/unpack передавать сначала 21 потом 20 регистр.
-                    x_low = client.read_holding_registers(i.x_registers[0])  # В struct pack/unpack передавать сначала 21 потом 20 регистр.
-                    y_high = client.read_holding_registers(i.y_registers[1])  # В struct pack/unpack передавать сначала 21 потом 20 регистр.
-                    y_low = client.read_holding_registers(i.y_registers[0])  # В struct pack/unpack передавать сначала 21 потом 20 регистр.
-
-                    if None in [x_high, x_low, y_high, y_low]:
+                result_measures = []
+                print(f"\t\t[*] Process device: {i.name} slave: {i.slave_number}")
+                client = ModbusClient(host=self.ip_address, port=self.port, unit_id=i.slave_number, timeout=30.0, debug=False, auto_open=True, auto_close=False) #Slave?
+                x_high = client.read_holding_registers(i.x_registers[1])  # В struct pack/unpack передавать сначала 21 потом 20 регистр.
+                x_low = client.read_holding_registers(i.x_registers[0])  # В struct pack/unpack передавать сначала 21 потом 20 регистр.
+                y_high = client.read_holding_registers(i.y_registers[1])  # В struct pack/unpack передавать сначала 21 потом 20 регистр.
+                y_low = client.read_holding_registers(i.y_registers[0])  # В struct pack/unpack передавать сначала 21 потом 20 регистр.
+                if None in [x_high, x_low, y_high, y_low]:
+                    print("\t\t\tNull received. Abort...")
+                    continue
+                
+                x_decoded = i.decode(x_high[0], x_low[0])
+                y_decoded = i.decode(y_high[0], y_low[0])
+                print(f"\t\t\tx_decoded: {x_decoded}")
+                print(f"\t\t\ty_decoded: {y_decoded}")
+                result_measures.append(x_decoded)
+                result_measures.append(y_decoded)
+                measure_object = Collected_Measures(i, result_measures)
+                Measure_Storage.stored_measures.put(measure_object)
+                client.close()
+                time.sleep(0.5)
+            elif i.type == "ZET_Thermometer":
+                result_measures = []
+                print(f"\t\t[*] Process device: {i.name} slave: {i.slave_number}")
+                client = ModbusClient(host=self.ip_address, port=self.port, unit_id=i.slave_number, timeout=30.0, debug=False, auto_open=True, auto_close=False) #Slave?
+                for j in range(1, i.last_sensor + 1):
+                    # print(f"Current reg is hex: {i.registers[j]} int: {int(i.registers[j],16)}")
+                    tk_raw_measure = client.read_holding_registers(int(i.registers[j],16))
+                    if tk_raw_measure == None:
                         print("\t\t\tNull received. Abort...")
                         continue
-                    
-                    x_decoded = i.decode(x_high[0], x_low[0])
-                    y_decoded = i.decode(y_high[0], y_low[0])
-                    print(f"\t\t\tx_decoded: {x_decoded}")
-                    print(f"\t\t\ty_decoded: {y_decoded}")
-                    measure_object = Collected_Measures(i, [x_decoded, y_decoded])
+                    result_measure = i.decode(tk_raw_measure[0])
+                    print(f"\t\t\t{j}: {result_measure}")
+                    result_measures.append(result_measure)
+                if len(result_measures) > 0:
+                    measure_object = Collected_Measures(i, result_measures)
                     Measure_Storage.stored_measures.put(measure_object)
-                    client.close()
-                    time.sleep(2)
-                    
-                    # print(f"{i.name} {i.type} | x: {i.decode(x_raw)} | y: {i.decode(y_raw)}")
-            else:
-                raise ValueError("[*] Wrong device type!")
+                client.close()
+                time.sleep(0.5)
+            elif i.type == "ZET_Accelerometer":
+                print(f"\t\t[*] Process device: {i.name} slave: {i.slave_number}")
+                client = ModbusClient(host=self.ip_address, port=self.port, unit_id=i.slave_number, timeout=30.0, debug=False, auto_open=True, auto_close=False)
+                counter = 0
+                for j in i.registers:
+                    acc_measure = client.read_holding_registers(j)
+                    if acc_measure == None:
+                        print("\t\t\tNull received. Abort...")
+                        continue
+                    print(f"\t\t\t{counter}: {acc_measure}")
+                    counter+=1
+                client.close()
+                time.sleep(0.5)
+            elif i.type == "ZET_Hygrometer":
+                print(f"\t\t[*] Process device: {i.name} slave: {i.slave_number}")
+                client = ModbusClient(host=self.ip_address, port=self.port, unit_id=i.slave_number, timeout=30.0, debug=False, auto_open=True, auto_close=False)
+                counter = 0
+                for j in i.registers:
+                    hg_measure = client.read_holding_registers(j)
+                    if hg_measure == None:
+                        print("\t\t\tNull received. Abort...")
+                        continue
+                    print(f"\t\t\t{counter}: {hg_measure}")
+                    counter+=1
+                client.close()
+                time.sleep(0.5)
+        return 0
 
 class Zet_device(object):
     def __init__(self, id: str, slave: int, name) -> None:
@@ -119,7 +195,7 @@ class Zet_Inclinometer(Zet_device):
         self.type = type
 
     def __str__(self):
-        return f"Zet_Inclinomter: ID: {self.id}, x_registers: {self.x_registers}, y_registers: {self.y_registers}, slave_number: {self.slave_number}"
+        return f"Zet_Inclinomter: ID: {self.id}, slave_number: {self.slave_number}"
 
     def decode(self, high_bytes, low_bytes):
         to_bytes = struct.pack('>HH', high_bytes, low_bytes)
@@ -127,19 +203,28 @@ class Zet_Inclinometer(Zet_device):
         return float_res[0]
     
 class Zet_Thermometer(Zet_device):
-    def __init__(self, id: str, slave: int, name:str, type:str, registers:list) -> None:
+    def __init__(self, id: str, slave: int, name:str, type:str, registers:list, last_sensor:int) -> None:
         super().__init__(id, slave, name)
         self.registers = registers
         self.type = type
+        self.last_sensor = last_sensor
+    
+    def __str__(self):
+        return f"Zet_Thermometer: ID: {self.id}, slave_number: {self.slave_number}"
 
-    def decode(self):
-        print(f"{self.type} {self.name} not implemented! Skip...")
+    def decode(self, raw_measure):
+        to_bytes = struct.pack('>H', raw_measure)
+        [decoded_measure] = struct.unpack('>h', to_bytes)
+        return decoded_measure / 100
     
 class Zet_Accelerometer(Zet_device):
     def __init__(self, id: str, slave: int, name:str, type:str, registers:list) -> None:
         super().__init__(id, slave, name)
         self.registers = registers
         self.type = type
+        
+    def __str__(self):
+        return f"Zet_Accelerometer: ID: {self.id}, slave_number: {self.slave_number}"
 
     def decode(self):
         print(f"{self.type} {self.name} not implemented! Skip...")
@@ -149,6 +234,9 @@ class Zet_Hygrometer(Zet_device):
         super().__init__(id, slave, name)
         self.registers = registers
         self.type = type
+        
+    def __str__(self):
+        return f"Zet_Hygrometer: ID: {self.id}, slave_number: {self.slave_number}"
 
     def decode(self):
         print(f"{self.type} {self.name} not implemented! Skip...")

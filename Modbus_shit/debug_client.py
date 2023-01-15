@@ -1,6 +1,6 @@
 from pyModbusTCP.client import ModbusClient
 import time
-
+import json
 
 #ACC
 #TG
@@ -40,12 +40,18 @@ def thermometer_example():
             0x124c,0x124d,0x124e,0x124f,0x1250,0x1251,0x1252,0x1253,0x1254,0x1255,0x1256,0x1257,0x1258,
             0x1259,0x125a,0x125b,0x125c,0x125d,0x125e,0x125f,0x1260,0x1261,0x1262,0x1263]
     
+    with open('config/converter.json', 'r') as f:
+        raw = json.load(f)
+        regs2 = raw["converters"][1]['devices'][0]['registers']
+        
+    
     for j in slaves:
         print(f"Slave: {j}")
         client = ModbusClient("192.168.9.19", 502, j, 30.0, False, True, False)
 
-        for i in regs:
-            print(client.read_holding_registers(i))
+        for i in regs2:
+            # print(client.read_holding_registers(i))
+            print(client.read_holding_registers(int(i, 16)))
         print()
         client.close()
         time.sleep(4)
