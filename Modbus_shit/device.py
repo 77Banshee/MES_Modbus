@@ -23,7 +23,28 @@ class Collected_Measures(object):
         self.measures = measures
         self.device_instance = device_instance
     def get_formatted_measures(self):
-        print("get_formatted_measures Not implemented!")
+        if self.device_instance.type == "ZET_7054_Inclinometer":
+            return f"{int(time.time())}\r\n{self.measures[0]}\r\n{self.measures[1]}"
+        elif self.device_instance.type == "ZET_Thermometer":
+            formatted_measures = ""
+            formatted_measures += f"{int(time.time())}\r\n"
+            for i in self.measures:
+                formatted_measures += f"{i}\r\n"
+            return formatted_measures
+        elif self.device_instance.type == "ZET_Accelerometer":
+            pass
+        elif self.device_instance.type == "ZET_Hygrometer":
+            pass
+    def get_formatted_topic_measures(self):
+        if self.device_instance.type == "ZET_7054_Inclinometer":
+            return f"Modbus/{self.device_instance.object_id}/{self.device_instance.building_id}/{self.device_instance.uspd}/Inclinometer/{self.device_instance.name}/measures"
+        elif self.device_instance.type == "ZET_Thermometer":
+            return f"Modbus/{self.device_instance.object_id}/{self.device_instance.building_id}/{self.device_instance.uspd}/Thermometer/{self.device_instance.name}/measures"
+        elif self.device_instance.type == "ZET_Accelerometer":
+            pass
+        elif self.device_instance.type == "ZET_Hygrometer":
+            pass
+            
     def __str__(self) -> str:
         return f"{self.device_instance.type} {self.device_instance.name} {self.device_instance.id} {self.measures}"
 
@@ -72,7 +93,10 @@ class Zet7076_Converter(object):
                             name=i["name"],
                             slave=i['slave'],
                             x_low_high_regs=i['registers']['x'], 
-                            y_low_high_regs=i['registers']['y']
+                            y_low_high_regs=i['registers']['y'],
+                            object_id=i["object_id"],
+                            building_id=i["building_id"],
+                            uspd=i["uspd"]
                         )
                     )
             elif i['type'] == 'ZET_Thermometer':
@@ -83,7 +107,10 @@ class Zet7076_Converter(object):
                             name=i["name"],
                             type=i["type"],
                             registers=i["registers"],
-                            last_sensor = i["last_sensor"]
+                            last_sensor = i["last_sensor"],
+                            object_id=i["object_id"],
+                            building_id=i["building_id"],
+                            uspd=i["uspd"]
                         )
                     )
             elif i['type'] == 'ZET_Accelerometer':
@@ -93,7 +120,10 @@ class Zet7076_Converter(object):
                             slave=i["slave"],
                             name=i["name"],
                             type=i["type"],
-                            registers=i["registers"]
+                            registers=i["registers"],
+                            object_id=i["object_id"],
+                            building_id=i["building_id"],
+                            uspd=i["uspd"]
                         )
                     )
             elif i['type'] == 'ZET_Hygrometer':
@@ -103,7 +133,10 @@ class Zet7076_Converter(object):
                             slave=i["slave"],
                             name=i["name"],
                             type=i["type"],
-                            registers=i["registers"]
+                            registers=i["registers"],
+                            object_id=i["object_id"],
+                            building_id=i["building_id"],
+                            uspd=i["uspd"]
                         )
                     )
 
@@ -182,16 +215,19 @@ class Zet7076_Converter(object):
         return 0
 
 class Zet_device(object):
-    def __init__(self, id: str, slave: int, name) -> None:
+    def __init__(self, id: str, slave: int, name: str, object_id: str, building_id: str, uspd: str) -> None:
         self.id = id
         self.slave_number = slave
         self.name = name
+        self.object_id = object_id
+        self.building_id = building_id
+        self.uspd = uspd
 
 class Zet_Inclinometer(Zet_device):
-    def __init__(self, id: str, slave: int, name:str, type:str, x_low_high_regs, y_low_high_regs) -> None:
-        super().__init__(id, slave, name)
+    def __init__(self, id: str, slave: int, name:str, type:str, x_low_high_regs, y_low_high_regs, object_id: str, building_id: str, uspd: str) -> None:
+        super().__init__(id, slave, name, object_id, building_id, uspd)
         self.x_registers = x_low_high_regs # 20 - low | 21 - high
-        self.y_registers = x_low_high_regs # 58 - low | 59 - high
+        self.y_registers = y_low_high_regs # 58 - low | 59 - high
         self.type = type
 
     def __str__(self):
@@ -203,8 +239,8 @@ class Zet_Inclinometer(Zet_device):
         return float_res[0]
     
 class Zet_Thermometer(Zet_device):
-    def __init__(self, id: str, slave: int, name:str, type:str, registers:list, last_sensor:int) -> None:
-        super().__init__(id, slave, name)
+    def __init__(self, id: str, slave: int, name:str, type:str, registers:list, last_sensor:int, object_id:str, building_id:str, uspd: str) -> None:
+        super().__init__(id, slave, name, object_id, building_id, uspd)
         self.registers = registers
         self.type = type
         self.last_sensor = last_sensor
@@ -218,8 +254,8 @@ class Zet_Thermometer(Zet_device):
         return decoded_measure / 100
     
 class Zet_Accelerometer(Zet_device):
-    def __init__(self, id: str, slave: int, name:str, type:str, registers:list) -> None:
-        super().__init__(id, slave, name)
+    def __init__(self, id: str, slave: int, name:str, type:str, registers:list, object_id: str, building_id: str, uspd: str) -> None:
+        super().__init__(id, slave, name, object_id, building_id, uspd)
         self.registers = registers
         self.type = type
         
@@ -230,8 +266,8 @@ class Zet_Accelerometer(Zet_device):
         print(f"{self.type} {self.name} not implemented! Skip...")
 
 class Zet_Hygrometer(Zet_device):
-    def __init__(self, id: str, slave: int, name:str, type:str, registers:list) -> None:
-        super().__init__(id, slave, name)
+    def __init__(self, id: str, slave: int, name:str, type:str, registers:list, object_id: str, building_id: str, uspd: str) -> None:
+        super().__init__(id, slave, name, object_id, building_id, uspd)
         self.registers = registers
         self.type = type
         
