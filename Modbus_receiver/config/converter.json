@@ -7,7 +7,7 @@
         {
           "slave": 19,
           "type": "ZET_7054_Inclinometer",
-          "name": "INC-9",
+          "name": "i9",
           "id": "80309",
           "object_id": "NTE",
           "building_id": "12",
@@ -26,7 +26,7 @@
         {
           "slave": 20,
           "type": "ZET_7054_Inclinometer",
-          "name": "INC-10",
+          "name": "i10",
           "id": "80310",
           "object_id": "NTE",
           "building_id": "12",
@@ -45,7 +45,7 @@
         {
           "slave": 21,
           "type": "ZET_7054_Inclinometer",
-          "name": "INC-11",
+          "name": "i11",
           "id": "80311",
           "object_id": "NTE",
           "building_id": "12",
@@ -64,7 +64,7 @@
         {
           "slave": 22,
           "type": "ZET_7054_Inclinometer",
-          "name": "INC-12",
+          "name": "i12",
           "id": "80312",
           "object_id": "NTE",
           "building_id": "12",
@@ -89,7 +89,7 @@
         {
           "slave": 23,
           "type": "ZET_7054_Inclinometer",
-          "name": "INC-13",
+          "name": "i13",
           "id": "80313",
           "object_id": "NTE",
           "building_id": "12",
@@ -108,7 +108,7 @@
         {
           "slave": 24,
           "type": "ZET_7054_Inclinometer",
-          "name": "INC-14",
+          "name": "i14",
           "id": "80314",
           "object_id": "NTE",
           "building_id": "12",
@@ -127,7 +127,7 @@
         {
           "slave": 25,
           "type": "ZET_7054_Inclinometer",
-          "name": "INC-15",
+          "name": "i15",
           "id": "80315",
           "object_id": "NTE",
           "building_id": "12",
@@ -146,7 +146,7 @@
         {
           "slave": 26,
           "type": "ZET_7054_Inclinometer",
-          "name": "INC-16",
+          "name": "i16",
           "id": "80316",
           "object_id": "NTE",
           "building_id": "12",
@@ -171,7 +171,7 @@
         {
           "slave": 27,
           "type": "ZET_7054_Inclinometer",
-          "name": "INC-17",
+          "name": "i17",
           "id": "80317",
           "object_id": "NTE",
           "building_id": "15",
@@ -190,7 +190,7 @@
         {
           "slave": 28,
           "type": "ZET_7054_Inclinometer",
-          "name": "INC-18",
+          "name": "i18",
           "id": "80318",
           "object_id": "NTE",
           "building_id": "15",
@@ -209,7 +209,7 @@
         {
           "slave": 29,
           "type": "ZET_7054_Inclinometer",
-          "name": "INC-19",
+          "name": "i19",
           "id": "80319",
           "object_id": "NTE",
           "building_id": "15",
@@ -228,7 +228,7 @@
         {
           "slave": 3,
           "type": "ZET_Accelerometer",
-          "name": "ACC-1",
+          "name": "acc1",
           "id": "80401",
           "object_id": "NTE",
           "building_id": "15",
@@ -257,7 +257,7 @@
         {
           "slave": 41,
           "type": "ZET_Hygrometer",
-          "name": "TG-1",
+          "name": "tg1",
           "id": "80501",
           "object_id": "NTE",
           "building_id": "15",
@@ -280,7 +280,7 @@
         {
           "slave": 30,
           "type": "ZET_7054_Inclinometer",
-          "name": "INC-20",
+          "name": "i20",
           "id": "80320",
           "object_id": "NTE",
           "building_id": "15",
@@ -299,7 +299,7 @@
         {
           "slave": 31,
           "type": "ZET_7054_Inclinometer",
-          "name": "INC-21",
+          "name": "i21",
           "id": "80321",
           "object_id": "NTE",
           "building_id": "15",
@@ -318,7 +318,7 @@
         {
           "slave": 32,
           "type": "ZET_7054_Inclinometer",
-          "name": "INC-22",
+          "name": "i22",
           "id": "80322",
           "object_id": "NTE",
           "building_id": "15",
@@ -337,7 +337,7 @@
         {
           "slave": 4,
           "type": "ZET_Accelerometer",
-          "name": "ACC-2",
+          "name": "acc2",
           "id": "80402",
           "object_id": "NTE",
           "building_id": "15",
@@ -366,7 +366,7 @@
         {
           "slave": 42,
           "type": "ZET_Hygrometer",
-          "name": "TG-2",
+          "name": "tg2",
           "id": "80502",
           "object_id": "NTE",
           "building_id": "15",
@@ -389,12 +389,13 @@
         {
           "slave": 26,
           "type": "ZET_Thermometer",
-          "name": "TK-6",
+          "name": "BH001960",
           "id": "80606",
           "object_id": "NTE",
           "building_id": "12",
           "uspd": "U0062",
           "last_sensor": 17,
+          "quantity" : 7,
           "registers": [
             "0x1000",
             "0x1010",
@@ -542,12 +543,13 @@
         {
           "slave": 27,
           "type": "ZET_Thermometer",
-          "name": "TK-7",
+          "name": "BH001961",
           "id": "80607",
           "object_id": "NTE",
           "building_id": "12",
           "uspd": "U0062",
           "last_sensor": 16,
+          "quantity" : 8,
           "registers": [
             "0x1000",
             "0x1010",
@@ -695,12 +697,13 @@
         {
           "slave": 28,
           "type": "ZET_Thermometer",
-          "name": "TK-8",
+          "name": "BH001962",
           "id": "80608",
           "object_id": "NTE",
           "building_id": "12",
           "uspd": "U0062",
           "last_sensor": 15,
+          "quantity" : 15,
           "registers": [
             "0x1000",
             "0x1010",
@@ -848,12 +851,13 @@
         {
           "slave": 25,
           "type": "ZET_Thermometer",
-          "name": "TK-5",
+          "name": "BH001959",
           "id": "80605",
           "object_id": "NTE",
           "building_id": "14",
           "uspd": "U0062",
           "last_sensor": 18,
+          "quantity" : 11,
           "registers": [
             "0x1000",
             "0x1010",
@@ -1007,12 +1011,13 @@
         {
           "slave": 29,
           "type": "ZET_Thermometer",
-          "name": "TK-9",
+          "name": "BH001963",
           "id": "80609",
           "object_id": "NTE",
           "building_id": "12",
           "uspd": "U0062",
           "last_sensor": 14,
+          "quantity" : 14,
           "registers": [
             "0x1000",
             "0x1010",
@@ -1160,12 +1165,13 @@
         {
           "slave": 30,
           "type": "ZET_Thermometer",
-          "name": "TK-10",
+          "name": "BH001964",
           "id": "80610",
           "object_id": "NTE",
           "building_id": "12",
           "uspd": "U0062",
           "last_sensor": 14,
+          "quantity" : 11,
           "registers": [
             "0x1000",
             "0x1010",

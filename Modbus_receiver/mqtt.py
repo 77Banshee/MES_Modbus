@@ -6,9 +6,9 @@ client = paho.mqtt.client.Client()
 def init(host, port = 1883):
     client.on_connect = on_connect
     client.on_message = on_message
-    client.connect(host, port)
+    client.connect(host, port, 3600)
     client.publish("DEBUG/Connected", 1)
-    client.on_disconnect = on_disconnect
+    # client.on_disconnect = on_disconnect
     
 def on_connect(client, userdata, flags, rc):
     if rc == 0:

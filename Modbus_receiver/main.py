@@ -36,7 +36,7 @@ def get_uspd_list(json_config):
     status_paths = []
     for i in json_config['converters']:
         for j in i['devices']:
-            status_path = f"Modbus/NTE/{j['building_id']}/{j['uspd']}/status/measure"
+            status_path = f"/Gorizont/NTE/{j['building_id']}/{j['uspd']}/status/measure"
             if status_path not in status_paths:
                 status_paths.append(status_path)
     return status_paths
@@ -48,21 +48,22 @@ def show_devices(converter_repo_instance):
             print(f"\tDevice: {j}")
 
 def main():
-    converter_repository.receive_all()
-    print("[*] Recieving done!\n")
-    while measure_storage.qsize() > 0:
-        meas = measure_storage.get()
-        print(f"Sending measures: {meas}")
-        #TOPIC?
-        mqtt.client.publish(
-            topic=meas.get_formatted_topic_measures(), 
-            payload=meas.get_formatted_measures()
-            )
-        for i in get_uspd_list(json_config):
+    while True:
+        converter_repository.receive_all()
+        print("[*] Recieving done!\n")
+        while measure_storage.qsize() > 0:
+            meas = measure_storage.get()
+            print(f"Sending measures: {meas}")
+            #TOPIC?
             mqtt.client.publish(
-                topic=i,
-                payload=f"Uptime:{int(time.time())}\r\nGateway:OK\r\nChirpstack:OK"
-            )
+                topic=meas.get_formatted_topic_measures(), 
+                payload=meas.get_formatted_measures()
+                )
+            for i in get_uspd_list(json_config):
+                mqtt.client.publish(
+                    topic=i,
+                    payload=f"Uptime:{int(time.time())}\r\nGateway:OK\r\nChirpstack:OK"
+                )
         time.sleep(60 * 15)
         
         

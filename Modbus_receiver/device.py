@@ -28,6 +28,7 @@ class Collected_Measures(object):
         elif self.device_instance.type == "ZET_Thermometer":
             formatted_measures = ""
             formatted_measures += f"{int(time.time())}\r\n"
+            formatted_measures += f"{self.device_instance.quantity}\r\n"
             for i in self.measures:
                 formatted_measures += f"{i}\r\n"
             return formatted_measures
@@ -37,9 +38,9 @@ class Collected_Measures(object):
             pass
     def get_formatted_topic_measures(self):
         if self.device_instance.type == "ZET_7054_Inclinometer":
-            return f"Modbus/{self.device_instance.object_id}/{self.device_instance.building_id}/{self.device_instance.uspd}/Inclinometer/{self.device_instance.name}/measures"
+            return f"/Gorizont/{self.device_instance.object_id}/{self.device_instance.building_id}/{self.device_instance.uspd}/Inclinometer/{self.device_instance.building_id}_{self.device_instance.name}/from_device/measure"
         elif self.device_instance.type == "ZET_Thermometer":
-            return f"Modbus/{self.device_instance.object_id}/{self.device_instance.building_id}/{self.device_instance.uspd}/Thermometer/{self.device_instance.name}/measures"
+            return f"/Gorizont/{self.device_instance.object_id}/{self.device_instance.building_id}/{self.device_instance.uspd}/Thermometer/{self.device_instance.building_id}_{self.device_instance.name}/from_device/measure"
         elif self.device_instance.type == "ZET_Accelerometer":
             pass
         elif self.device_instance.type == "ZET_Hygrometer":
@@ -110,7 +111,8 @@ class Zet7076_Converter(object):
                             last_sensor = i["last_sensor"],
                             object_id=i["object_id"],
                             building_id=i["building_id"],
-                            uspd=i["uspd"]
+                            uspd=i["uspd"],
+                            quantity=i["quantity"]
                         )
                     )
             elif i['type'] == 'ZET_Accelerometer':
@@ -157,7 +159,7 @@ class Zet7076_Converter(object):
                 if None in [x_high, x_low, y_high, y_low]:
                     print("\t\t\tNull received. Abort...")
                     continue
-                
+
                 x_decoded = i.decode(x_high[0], x_low[0])
                 y_decoded = i.decode(y_high[0], y_low[0])
                 print(f"\t\t\tx_decoded: {x_decoded}")
@@ -170,6 +172,7 @@ class Zet7076_Converter(object):
                 time.sleep(0.5)
             elif i.type == "ZET_Thermometer":
                 result_measures = []
+                # result_measures.append()
                 print(f"\t\t[*] Process device: {i.name} slave: {i.slave_number}")
                 client = ModbusClient(host=self.ip_address, port=self.port, unit_id=i.slave_number, timeout=30.0, debug=False, auto_open=True, auto_close=False) #Slave?
                 for j in range(1, i.last_sensor + 1):
@@ -182,7 +185,8 @@ class Zet7076_Converter(object):
                     print(f"\t\t\t{j}: {result_measure}")
                     result_measures.append(result_measure)
                 if len(result_measures) > 0:
-                    measure_object = Collected_Measures(i, result_measures)
+                    sensor_offset = len(result_measures) - i.quantity
+                    measure_object = Collected_Measures(i, result_measures[sensor_offset:])
                     Measure_Storage.stored_measures.put(measure_object)
                 client.close()
                 time.sleep(0.5)
@@ -239,11 +243,12 @@ class Zet_Inclinometer(Zet_device):
         return float_res[0]
     
 class Zet_Thermometer(Zet_device):
-    def __init__(self, id: str, slave: int, name:str, type:str, registers:list, last_sensor:int, object_id:str, building_id:str, uspd: str) -> None:
+    def __init__(self, id: str, slave: int, name:str, type:str, registers:list, last_sensor:int, object_id:str, building_id:str, uspd: str, quantity: str) -> None:
         super().__init__(id, slave, name, object_id, building_id, uspd)
         self.registers = registers
         self.type = type
         self.last_sensor = last_sensor
+        self.quantity = quantity
     
     def __str__(self):
         return f"Zet_Thermometer: ID: {self.id}, slave_number: {self.slave_number}"
