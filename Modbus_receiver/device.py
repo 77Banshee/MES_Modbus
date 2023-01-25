@@ -146,14 +146,17 @@ class Zet7076_Converter(object):
                 client = ModbusClient(host=self.ip_address, port=self.port, unit_id=i.slave_number, timeout=30.0, debug=False, auto_open=True, auto_close=False) #Slave?
                 x_high = client.read_holding_registers(i.x_registers[1])  # В struct pack/unpack передавать сначала 21 потом 20 регистр.
                 x_low = client.read_holding_registers(i.x_registers[0])  # В struct pack/unpack передавать сначала 21 потом 20 регистр.
+                x_full = client.read_holding_registers(i.x_registers[0], 2)
                 y_high = client.read_holding_registers(i.y_registers[1])  # В struct pack/unpack передавать сначала 21 потом 20 регистр.
                 y_low = client.read_holding_registers(i.y_registers[0])  # В struct pack/unpack передавать сначала 21 потом 20 регистр.
+                y_full = client.read_holding_registers(i.y_registers[0], 2)
+                
                 if None in [x_high, x_low, y_high, y_low]:
                     print("\t\t\tNull received. Abort...")
                     continue
-                # print(f"X_READED: \r\nhigh {x_high}\r\nlow {x_low}")
-                # print(f"x_raw: high {x_high[0]} low {x_low[0]}")
-                # print(f"y_raw: high {y_high[0]} low {y_low[0]}")
+                print(f"X_READED: \r\nhigh {x_high}\r\nlow {x_low}")
+                print(f"x_raw: high {x_high[0]} low {x_low[0]}")
+                print(f"y_raw: high {y_high[0]} low {y_low[0]}")
                 x_decoded = i.decode(x_high[0], x_low[0])
                 y_decoded = i.decode(y_high[0], y_low[0])
                 print(f"\t\t\tx_decoded: {x_decoded}")

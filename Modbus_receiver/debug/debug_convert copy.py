@@ -38,16 +38,10 @@ ii = [31813, 16637]
 
 
 def foo(a, b):
-    raw_bytes = struct.pack('>HH', a, b)
+    raw_bytes = struct.pack('>HH', b, a)
     [res] = struct.unpack('>f', raw_bytes)
-    print(res)
-    
-foo(aa[1], aa[0])
-foo(bb[1], bb[0])
-foo(cc[1], cc[0])
-foo(dd[1], dd[0])
-foo(ee[1], ee[0])
-foo(ff[1], ff[0])
-foo(gg[1], gg[0])
-foo(hh[1], hh[0])
-foo(ii[1], ii[0])
+    print(res * 3600.0)
+
+a = [62392, 16405]
+
+foo(a[0], a[1])
