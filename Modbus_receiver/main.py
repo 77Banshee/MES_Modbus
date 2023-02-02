@@ -9,17 +9,17 @@ import time
 
 debug = 0
 
-#192.168.9.
-    #..
-    #..
-    #13 check
-    #14 check
-    #15 check
-    #16 
-    #..
-    #..
-    #19 check
-    #20 check
+# 192.168.9.
+    # ..
+    # 12 check
+    # 13 check
+    # 14 check
+    # 15 check
+    # 16 check
+    # 17 check
+    # 18 check
+    # 19 check
+    # 20 check
 
 # Init instances
 with open("config/converter.json", 'r') as f:
@@ -29,7 +29,7 @@ mqtt_port = 1883
 converter_repository = device.Converter_Repository(json_config)
 measure_storage = device.Measure_Storage.stored_measures
 if debug == 0:
-    mqtt_client =  mqtt.client
+    mqtt_client = mqtt.client
     mqtt.init(mqtt_host, mqtt_port)
 
 def get_uspd_list(json_config):
