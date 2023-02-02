@@ -10,7 +10,7 @@
           "name": "i5",
           "id": "80309",
           "object_id": "NTE",
-          "building_id": "12",
+          "building_id": "14",
           "uspd": "U0062",
           "registers": {
             "x": [
@@ -29,7 +29,7 @@
           "name": "i6",
           "id": "80310",
           "object_id": "NTE",
-          "building_id": "12",
+          "building_id": "14",
           "uspd": "U0062",
           "registers": {
             "x": [
@@ -48,7 +48,7 @@
           "name": "i7",
           "id": "80311",
           "object_id": "NTE",
-          "building_id": "12",
+          "building_id": "14",
           "uspd": "U0062",
           "registers": {
             "x": [
@@ -67,7 +67,7 @@
           "name": "i8",
           "id": "80312",
           "object_id": "NTE",
-          "building_id": "12",
+          "building_id": "14",
           "uspd": "U0062",
           "registers": {
             "x": [
@@ -474,7 +474,7 @@
           "name": "BH001956",
           "id": "80606",
           "object_id": "NTE",
-          "building_id": "12",
+          "building_id": "14",
           "uspd": "U0062",
           "last_sensor": 17,
           "quantity": 7,
@@ -628,7 +628,7 @@
           "name": "BH001955",
           "id": "80606",
           "object_id": "NTE",
-          "building_id": "12",
+          "building_id": "14",
           "uspd": "U0062",
           "last_sensor": 17,
           "quantity": 7,
@@ -782,7 +782,7 @@
           "name": "BH001959",
           "id": "80606",
           "object_id": "NTE",
-          "building_id": "12",
+          "building_id": "14",
           "uspd": "U0062",
           "last_sensor": 17,
           "quantity": 7,
@@ -942,7 +942,7 @@
           "name": "BH001957",
           "id": "80606",
           "object_id": "NTE",
-          "building_id": "12",
+          "building_id": "14",
           "uspd": "U0062",
           "last_sensor": 17,
           "quantity": 7,
@@ -1096,7 +1096,7 @@
           "name": "BH001958",
           "id": "80606",
           "object_id": "NTE",
-          "building_id": "12",
+          "building_id": "14",
           "uspd": "U0062",
           "last_sensor": 17,
           "quantity": 7,
