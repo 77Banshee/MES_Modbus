@@ -61,6 +61,10 @@ def main():
                 topic=meas.get_formatted_topic_measures(), 
                 payload=meas.get_formatted_measures()
                 )
+            mqtt.client.publish(
+                topic=meas.get_formatted_topic_measures() + "_info", 
+                payload=meas.get_formatted_meta_info()
+                )
         for i in get_uspd_list(json_config):
             mqtt.client.publish(
                 topic=i,

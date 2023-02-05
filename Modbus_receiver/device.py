@@ -8,9 +8,12 @@ class Measure_Storage(object):
     stored_measures = queue.Queue()
 
 class Collected_Measures(object):
-    def __init__(self, device_instance, measures) -> None:
+    def __init__(self, device_instance, measures, device_info) -> None:
         self.measures = measures
         self.device_instance = device_instance
+        self.device_info = device_info
+    def get_formatted_meta_info(self):
+        return self.device_info
     def get_formatted_measures(self):
         if self.device_instance.type == "ZET_7054_Inclinometer":
             return f"{int(time.time())}\r\n{self.measures[0]}\r\n{self.measures[1]}"
@@ -163,7 +166,7 @@ class Zet7076_Converter(object):
                 print(f"\t\t\ty_decoded: {y_decoded}")
                 tk_raw_values.append(x_decoded)
                 tk_raw_values.append(y_decoded)
-                measure_object = Collected_Measures(i, tk_raw_values)
+                measure_object = Collected_Measures(i, tk_raw_values, f"{i.slave_number}")
                 Measure_Storage.stored_measures.put(measure_object)
                 client.close()
                 time.sleep(0.5)
@@ -181,10 +184,12 @@ class Zet7076_Converter(object):
                     result_measure = i.decode(tk_raw_measure[0])
                     print(f"\t\t\t{j}: {result_measure}")
                     tk_raw_values.append(result_measure)
-                if len(tk_raw_values) == i.quantity:
+                if len(tk_raw_values) == i.last_sensor:
                     sensor_offset = len(tk_raw_values) - i.quantity
-                    measure_object = Collected_Measures(i, tk_raw_values[sensor_offset:])
+                    measure_object = Collected_Measures(i, tk_raw_values[sensor_offset:], f"{i.slave_number}")
                     Measure_Storage.stored_measures.put(measure_object)
+                else:
+                    print(f"ERROR! TK {i.name} CAN'T BE SEND CUS tk_raw_values: {len(tk_raw_values)} | quantity: {i.quantity}!")
                 client.close()
                 time.sleep(0.5)
             elif i.type == "ZET_Accelerometer":
@@ -212,7 +217,7 @@ class Zet7076_Converter(object):
                             decoded_value
                         )
                     print(f"\t\t\tdecoded_x: {x_y_z[0]}", f"\t\t\tdecoded_y: {x_y_z[1]}", f"\t\t\tdecoded_z: {x_y_z[2]}", sep="\r\n")
-                    measure_object = Collected_Measures(i, x_y_z)
+                    measure_object = Collected_Measures(i, x_y_z, f"{i.slave_number}")
                     Measure_Storage.stored_measures.put(measure_object)
                 client.close()
                 time.sleep(0.5)
@@ -239,7 +244,7 @@ class Zet7076_Converter(object):
                         hg_result_measures.append(humidity)
                         hg_result_measures.append(temperature)
                         hg_result_measures.append(pressure)
-                        measure_object = Collected_Measures(i, hg_result_measures)
+                        measure_object = Collected_Measures(i, hg_result_measures, f"{i.slave_number}")
                         Measure_Storage.stored_measures.put(measure_object)
                     counter+=1
                 ##
