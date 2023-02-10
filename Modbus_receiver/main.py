@@ -37,7 +37,7 @@ def get_uspd_list(json_config):
     for i in json_config['converters']:
         for j in i['devices']:
             # status_path = f"_/Gorizont/NTE/{j['building_id']}/{j['uspd']}/status/measure"
-            status_path = f"_/Gorizont/NTE/{j['uspd']}/status/measure"
+            status_path = f"/Gorizont/NTE/{j['uspd']}/status/measure"
             if status_path not in status_paths:
                 status_paths.append(status_path)
     return status_paths

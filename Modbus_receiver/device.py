@@ -33,13 +33,13 @@ class Collected_Measures(object):
             return f"{int(time.time())}\r\n{humidity}\r\n{pressure}\r\n{temperature}"
     def get_formatted_topic_measures(self):
         if self.device_instance.type == "ZET_7054_Inclinometer":
-            return f"_/Gorizont/{self.device_instance.object_id}/{self.device_instance.building_id}/{self.device_instance.uspd}/Inclinometer/{self.device_instance.building_id}_{self.device_instance.name}/from_device/measure"
+            return f"/Gorizont/{self.device_instance.object_id}/{self.device_instance.building_id}/{self.device_instance.uspd}/Inclinometer/{self.device_instance.building_id}_{self.device_instance.name}/from_device/measure"
         elif self.device_instance.type == "ZET_Thermometer":
-            return f"_/Gorizont/{self.device_instance.object_id}/{self.device_instance.building_id}/{self.device_instance.uspd}/Thermometer/{self.device_instance.building_id}_{self.device_instance.name}/from_device/measure"
+            return f"/Gorizont/{self.device_instance.object_id}/{self.device_instance.building_id}/{self.device_instance.uspd}/Thermometer/{self.device_instance.building_id}_{self.device_instance.name}/from_device/measure"
         elif self.device_instance.type == "ZET_Accelerometer":
-            return f"_/Gorizont/{self.device_instance.object_id}/{self.device_instance.building_id}/{self.device_instance.uspd}/Accelerometer/{self.device_instance.building_id}_{self.device_instance.name}/from_device/measure"
+            return f"/Gorizont/{self.device_instance.object_id}/{self.device_instance.building_id}/{self.device_instance.uspd}/Accelerometer/{self.device_instance.building_id}_{self.device_instance.name}/from_device/measure"
         elif self.device_instance.type == "ZET_Hygrometer":
-            return f"_/Gorizont/{self.device_instance.object_id}/{self.device_instance.building_id}/{self.device_instance.uspd}/Hygrometer/{self.device_instance.building_id}_{self.device_instance.name}/from_device/measure"
+            return f"/Gorizont/{self.device_instance.object_id}/{self.device_instance.building_id}/{self.device_instance.uspd}/Hygrometer/{self.device_instance.building_id}_{self.device_instance.name}/from_device/measure"
             
     def __str__(self) -> str:
         return f"{self.device_instance.type} {self.device_instance.name} {self.device_instance.id} {self.measures}"
@@ -164,8 +164,8 @@ class Zet7076_Converter(object):
                 y_decoded = i.decode(y_high[0], y_low[0])
                 print(f"\t\t\tx_decoded: {x_decoded}")
                 print(f"\t\t\ty_decoded: {y_decoded}")
-                tk_raw_values.append(x_decoded)
-                tk_raw_values.append(y_decoded)
+                tk_raw_values.append(x_decoded / 3600)
+                tk_raw_values.append(y_decoded / 3600)
                 measure_object = Collected_Measures(i, tk_raw_values, f"{i.slave_number}")
                 Measure_Storage.stored_measures.put(measure_object)
                 client.close()
